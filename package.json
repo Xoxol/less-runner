@@ -1,0 +1,15 @@
+{
+  "name": "less-runner",
+  "version": "0.1.0",
+  "description": "The module to init LESS-compilation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "less",
+    "plugins"
+  ],
+  "author": "Eugene Kulikov",
+  "license": "BSD-2-Clause"
+}
