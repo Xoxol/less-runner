@@ -11,5 +11,9 @@
     "plugins"
   ],
   "author": "Eugene Kulikov",
-  "license": "BSD-2-Clause"
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "less": "~1.7.4",
+    "less-features": "https://github.com/xoxol/less-features/tarball/master"
+  }
 }
