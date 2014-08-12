@@ -26,7 +26,7 @@ Runner.prototype = {
             file = req._parsedUrl.pathname.replace(/(.+)\.css(?:\?.+)?/, path + '$1.less');
 
         this._res = res;
-        fs.readFile(file, options, this.parse);
+        fs.readFile(file, options, this.parse.bind(this));
     },
     parse: function(err, code) {
         var parser = less.Parser();
@@ -36,7 +36,7 @@ Runner.prototype = {
             return;
         }
 
-        parser.parse(code, this.toCSS);
+        parser.parse(code, this.toCSS.bind(this));
     },
     toCSS: function(err, data) {
         var options = {},
