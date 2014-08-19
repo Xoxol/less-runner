@@ -8,13 +8,23 @@ function Runner (config) {
     this._path = this._config.path || '.';
     this._options = this._config.options || {};
     this._env = this._config.env || 'default';
-    this._list = require('.' + this._path + '/config')[this._env];
+    this._list = getFeaturesList(this._path + '/config.json', this._env);
 
-    fs.watchFile(this._path + '/config', update(this));
+    fs.watchFile(this._path + '/config.json', update(this));
+
+    function getFeaturesList (path, env) {
+        var config;
+
+        config = fs.readFileSync(path, {encoding: 'utf-8'});
+        config = JSON.parse(config);
+
+        return config[env];
+    }
 
     function update (self) {
         return function() {
-            self._list = require(self._path + '/config')[self._env];
+            console.log(self._list);
+            self._list = getFeaturesList(self._path + '/config.json', self._env);
         }
     }
 }
