@@ -4,13 +4,13 @@ var less = require('less'),
     parser = less.Parser(),
     logger;
 
-function Runner(c, l) {
-    var config = c || {};
+function Runner(config, logger) {
+    config = config || {};
+    logger = logger || console;
 
-    logger = l || console;
     this._path = config.path || '.';
     this._options = config.options || {};
-    this._env = this._config.env || 'default';
+    this._env = config.env || 'default';
     this._list = getFeaturesList(this._path + '/config.json', this._env);
     fs.watchFile(this._path + '/config.json', update(this));
 
