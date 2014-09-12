@@ -36,22 +36,16 @@ function Runner(config, logger) {
 }
 
 function toCSS(err, data) {
-    var features;
+    var options = require('./config');
 
     if (err) {
         logger.log(err);
         return;
     }
 
-    features = new Features(less.tree, this._list);
+    options.features = new Features(less.tree, this._list);
 
-    this._res.end(data.toCSS({
-
-        plugins: [
-            features
-        ]
-
-    }));
+    this._res.end(data.toCSS(options));
 }
 
 Runner.prototype = {
