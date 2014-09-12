@@ -43,7 +43,7 @@ function toCSS(err, data) {
         return;
     }
 
-    options.features = new Features(less.tree, this._list);
+    options.plugins = [new Features(less.tree, this._list)];
 
     this._res.end(data.toCSS(options));
 }
