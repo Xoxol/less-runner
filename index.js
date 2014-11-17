@@ -56,7 +56,7 @@ function toCSS(err, data) {
 Runner.prototype = {
 
     run: function(req, res) {
-        var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, '.$1.less');
+        var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, '..$1.less');
 
         logger.info('Читаем less файл по пути ' + file + ' для запуска компиляции');
 
