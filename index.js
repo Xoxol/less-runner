@@ -1,7 +1,7 @@
 var less = require('less'),
     fs = require('fs'),
     Features = require('less-features'),
-    parser = less.Parser(),
+    parser = less.Parser({'relativeUrls': true, 'paths': ['../styles/']}),
     logger;
 
 function Runner(config, _logger) {
