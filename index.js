@@ -4,9 +4,9 @@ var less = require('less'),
     parser = less.Parser({'relativeUrls': true, 'paths': ['../styles/']}),
     logger;
 
-function Runner(config, _logger) {
+function Runner(config, log) {
     config = config || {};
-    logger = _logger || console;
+    logger = log || console;
 
     this._path = config.path || '.';
     this._options = config.options || {};
@@ -37,7 +37,8 @@ function Runner(config, _logger) {
 }
 
 function toCSS(err, data) {
-    var options = require('./config');
+    var options = require('./config'),
+        css;
 
     if (err) {
         logger.info(err) && logger.error(err);
@@ -50,7 +51,11 @@ function toCSS(err, data) {
 
     logger.info('Опции для генерации стилей:' + "\n", options);
 
-    this._res.end(data.toCSS(options));
+    css = data.toCSS(options);
+
+    this._res.writeHead(200, {'Content-Type': 'text/css', 'Content-Length': Buffer.byteLength(css)});
+    this._res.write(css);
+    this._res.end();
 }
 
 Runner.prototype = {
