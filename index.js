@@ -16,7 +16,7 @@ var less = require('less'),
         'relativeUrls: true,
         'paths': ['../styles/']
     },
-    'list': '../styles/features.json' файл, в котором будед указан список активных фич
+    'list': '../styles/features.json' путь к файлу, в котором будед указан список активных фич
  }
  */
 
@@ -29,12 +29,6 @@ function runner(cfg, log) {
     list = require(config.list)[config.env];
     config.options.plugins = [new Features(less.tree, list)];
 
-   /* less.logger.addListener({
-        debug: logger.trace,
-        info: logger.info,
-        warn: logger.warn
-    });*/
-
     return function(req, res){
         var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, config.basepath + '$1.less');
 
@@ -46,7 +40,7 @@ function render(res) {
     return function(err, data) {
         if(err) {
             logger.error(err.toString());
-            res.end(err.toString());
+            error(err);
             return;
         }
 
@@ -58,7 +52,6 @@ function render(res) {
 
             ok(data);
         });
-            //.then(ok, error);
     };
 
     function ok(data) {
