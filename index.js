@@ -1,87 +1,78 @@
 var less = require('less'),
-    fs = require('fs'),
     Features = require('less-features'),
-    parser = less.Parser({'relativeUrls': true, 'paths': ['../styles/']}),
-    logger;
+    fs = require('fs'),
+    logger,
+    config;
 
-function Runner(config, log) {
-    config = config || {};
+/*
+ cfg = {
+    'env': 'ad',
+    'basepath': '..', корневая папка для построение относительных путей
+    'fs: { опции, используемые для чтения файла
+        'encoding': 'utf-8'
+    },
+    'options': { конфигурация для less
+        'compress': false,
+        'relativeUrls: true,
+        'paths': ['../styles/']
+    },
+    'list': '../styles/features.json' файл, в котором будед указан список активных фич
+ }
+ */
+
+function runner(cfg, log) {
+    var list;
+
+    config = cfg || {};
     logger = log || console;
 
-    this._path = config.path || '.';
-    this._options = config.options || {};
-    this._env = config.env || 'default';
-    this._list = getFeaturesList(this._path + '/config.json', this._env);
-    fs.watchFile(this._path + '/config.json', update(this));
+    list = require(config.list)[config.env];
+    config.options.plugins = [new Features(less.tree, list)];
 
-    function getFeaturesList(path, env) { logger.info('Получаем список активных фич:'); //!!!
+   /* less.logger.addListener({
+        debug: logger.trace,
+        info: logger.info,
+        warn: logger.warn
+    });*/
 
-        var config = JSON.parse(fs.readFileSync(path, {
-            encoding: 'utf-8'
-        }));
+    return function(req, res){
+        var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, config.basepath + '$1.less');
 
-        logger.info(config[env]); //!!!
-        return config[env];
+        fs.readFile(file, config.fs, render(res));
     }
-
-    function update(self) {
-
-        return function() {
-            logger.info(self._list);
-            self._list = getFeaturesList(self._path + '/config.json', self._env);
-        };
-
-    }
-
-    logger.info('Копия Runner создана:', this); //!!!
 }
 
-function toCSS(err, data) {
-    var options = require('./config'),
-        css;
-
-    if (err) {
-        logger.info(err) && logger.error(err);
-        return;
-    }
-
-    logger.info('Стили успешно спарсены');
-
-    options.plugins = [new Features(less.tree, this._list)];
-
-    logger.info('Опции для генерации стилей:' + "\n", options);
-
-    css = data.toCSS(options);
-
-    this._res.writeHead(200, {'Content-Type': 'text/css', 'Content-Length': Buffer.byteLength(css)});
-    this._res.write(css);
-    this._res.end();
-}
-
-Runner.prototype = {
-
-    run: function(req, res) {
-        var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, '..$1.less');
-
-        logger.info('Читаем less файл по пути ' + file + ' для запуска компиляции');
-
-
-        this._res = res;
-
-        fs.readFile(file, this._options, this.parse.bind(this));
-    },
-
-    parse: function(err, code) {
-
-        if (err) {
-            logger.info('Ошибка чтения файла', err) && logger.error(err);
+function render(res) {
+    return function(err, data) {
+        if(err) {
+            logger.error(err.toString());
+            res.end(err.toString());
             return;
         }
 
-        logger.info('Файл успешно прочитан');
-        parser.parse(code, toCSS.bind(this));
+        less.render(data, config.options, function(err, data) {
+            if(err) {
+                error(err);
+                return;
+            }
+
+            ok(data);
+        });
+            //.then(ok, error);
+    };
+
+    function ok(data) {
+        res.writeHead(200, {'Content-Type': 'text/css', 'Content-Length': Buffer.byteLength(data)});
+        res.write(data);
+        res.end();
     }
 
-};
+    function error(err) {
+        logger.error(err.toString());
+        res.writeHead(500, {'Content-Type': 'text/html', 'Content-Length': Buffer.byteLength(err.toString())});
+        res.write(err.toString());
+        res.end();
+    }
+}
 
-module.exports = Runner;
+module.exports = runner;
