@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Xoxol/less-runner",
   "author": "Eugene Kulikov",
-  "license": "BSD-2-Clause",
+  "license": "MIT",
   "dependencies": {
     "less": "1.7.x",
     "less-features": "https://github.com/xoxol/less-features/tarball/master"
