@@ -22,6 +22,6 @@
   "license": "MIT",
   "dependencies": {
     "less": "1.7.x",
-    "less-features": "https://github.com/xoxol/less-features/tarball/master"
+    "less-features": "0.0.1"
   }
 }
