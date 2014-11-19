@@ -1,14 +1,15 @@
 var less = require('less'),
     Features = require('less-features'),
     fs = require('fs'),
+    path = require('path'),
     logger,
     config;
 
 /*
  cfg = {
     'env': 'ad',
-    'basepath': '..', корневая папка для построение относительных путей
-    'fs: { опции, используемые для чтения файла
+    'basepath': '..', относительный путь от папки, где запущен node, до корневой папки сайта
+    'fs: { опции, используемые для чтения less файла
         'encoding': 'utf-8'
     },
     'options': { конфигурация для less
@@ -25,6 +26,9 @@ function runner(cfg, log) {
 
     config = cfg || {};
     logger = log || console;
+
+    config.list = path.resolve(process.cwd(), config.list);
+    logger.info('Список фич будет прочитан из файла', config.list);
 
     list = require(config.list)[config.env];
     config.options.plugins = [new Features(less.tree, list)];
