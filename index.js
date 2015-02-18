@@ -7,17 +7,16 @@ var less = require('less'),
 
 /*
  cfg = {
-    'env': 'ad',
-    'basepath': '..', относительный путь от папки, где запущен node, до корневой папки сайта
-    'fs: { опции, используемые для чтения less файла
+    'basepath': '..',                   //relative path from the folder where the was run node to the root of the site
+    'fs: {                              //options used to read a less-file
         'encoding': 'utf-8'
     },
-    'options': { конфигурация для less
+    'options': {                        //less configuration
         'compress': false,
         'relativeUrls: true,
         'paths': ['../styles/']
     },
-    'list': '../styles/features.json' путь к файлу, в котором будед указан список активных фич
+    'list': '../styles/features.json'   //path to the file which contains less-features
  }
  */
 
@@ -28,12 +27,12 @@ function runner(cfg, log) {
     logger = log || console;
 
     config.list = path.resolve(process.cwd(), config.list);
-    logger.info('Список фич будет прочитан из файла', config.list);
+    logger.info('The features will be read from: ', config.list);
 
-    list = require(config.list)[config.env];
+    list = require(config.list);
     config.options.plugins = [new Features(less.tree, list)];
 
-    return function(req, res){
+    return function(req, res) {
         var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, config.basepath + '$1.less');
 
         fs.readFile(file, config.fs, render(res));
