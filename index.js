@@ -5,21 +5,6 @@ var less = require('less'),
     logger,
     config;
 
-/*
- cfg = {
-    'basepath': '..',                   //relative path from the folder where the was run node to the root of the site
-    'fs: {                              //options used to read a less-file
-        'encoding': 'utf-8'
-    },
-    'options': {                        //less configuration
-        'compress': false,
-        'relativeUrls: true,
-        'paths': ['../styles/']
-    },
-    'list': '../styles/features.json'   //path to the file which contains less-features
- }
- */
-
 function runner(cfg, log) {
     var list;
 
@@ -30,7 +15,7 @@ function runner(cfg, log) {
     logger.info('The features will be read from: ', config.list);
 
     list = require(config.list);
-    config.options.plugins = [new Features(less.tree, list)];
+    config.options.plugins = [new Features(list)];
 
     return function(req, res) {
         var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, config.basepath + '$1.less');
@@ -58,8 +43,8 @@ function render(res) {
     };
 
     function ok(data) {
-        res.writeHead(200, {'Content-Type': 'text/css', 'Content-Length': Buffer.byteLength(data)});
-        res.write(data);
+        res.writeHead(200, {'Content-Type': 'text/css', 'Content-Length': Buffer.byteLength(data.css)});
+        res.write(data.css);
         res.end();
     }
 

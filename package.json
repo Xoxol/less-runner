@@ -1,6 +1,6 @@
 {
   "name": "less-runner",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "The module to init LESS-compilation",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   "author": "Eugene Kulikov",
   "license": "MIT",
   "dependencies": {
-    "less": "1.7.x",
-    "less-features": "0.0.1"
+    "less": "2.5.x",
+    "less-features": "1.0.x"
   }
 }
