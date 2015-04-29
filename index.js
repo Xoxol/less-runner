@@ -1,27 +1,51 @@
 var less = require('less'),
     Features = require('less-features'),
+    xhr = require('node-xhr'),
     fs = require('fs'),
+    url = require('url'),
     path = require('path'),
     logger,
     config;
 
 function runner(cfg, log) {
-    var list;
-
     config = cfg || {};
     logger = log || console;
-
-    config.list = path.resolve(process.cwd(), config.list);
-    logger.info('The features will be read from: ', config.list);
-
-    list = require(config.list);
-    config.options.plugins = [new Features(list)];
 
     return function(req, res) {
         var file = req.originalUrl.replace(/(.+)\.css(?:\?.+)?/, config.basepath + '$1.less');
 
         fs.readFile(file, config.fs, render(res));
     }
+}
+
+function features(callback) {
+
+    var list = url.parse(config.list);
+
+    if(list.protocol === 'file:') {
+        list = path.resolve(process.cwd(), list.hostname + list.pathname);
+        callback(null, require(list) || {});
+        return;
+    }
+
+    xhr.get({url: list.href}, function(err, result) {
+        var list = {};
+
+        if(err) {
+            callback(err, null);
+            return;
+        }
+
+        result.body.forEach(function(feature) {
+
+            if(feature.provider === 'Permanent' && feature.enabled) {
+                list[feature.name] = feature.enabled;
+            }
+
+        });
+
+        callback(null, list);
+    });
 }
 
 function render(res) {
@@ -32,13 +56,23 @@ function render(res) {
             return;
         }
 
-        less.render(data, config.options, function(err, data) {
+        features(function(err, list) {
             if(err) {
                 error(err);
                 return;
             }
 
-            ok(data);
+            config.options.plugins = [new Features(list)];
+
+            less.render(data, config.options, function(err, data) {
+                if(err) {
+                    error(err);
+                    return;
+                }
+
+                ok(data);
+            });
+
         });
     };
 
